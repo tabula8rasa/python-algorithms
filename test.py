@@ -117,7 +117,7 @@ digits = [
 t = datetime.datetime.now()
 delta = datetime.timedelta(seconds=1/60)
 
-def wtfamidoing(obj, state):
+def func_rotation(obj, state):
 
     if obj.arrow_hour.rotation % 360  != obj.states[state][0] or obj.arrow_min.rotation % 360 != obj.states[state][1]:
         h, m = 0, 0
@@ -145,33 +145,24 @@ def update(dt):
     global t
     t += delta
 
-    if len(str(t.hour)) == 1:
-        hour_f = '0'
-        hour_s = str(t.hour)[0]
-    else:
-        hour_f = str(t.hour)[0]
-        hour_s = str(t.hour)[1]
-    if len(str(t.minute)) == 1:
-        minute_f = '0'
-        minute_s = str(t.minute)[0]
-    else:
-        minute_f = str(t.minute)[0]
-        minute_s = str(t.minute)[1]
-    if len(str(t.second)) == 1:
-        second_f = '0'
-        second_s = str(t.second)[0]
-    else:
-        second_f = str(t.second)[0]
-        second_s = str(t.second)[1]
+    h = str(t.hour)
+    m = str(t.minute)
+    s = str(t.second)
+
+    hour_f = '0' if len(h) == 1 else h[0]
+    hour_s = h[0] if len(h) == 1 else h[1]
+
+    minute_f = '0' if len(m) == 1 else m[0]
+    minute_s = m[0] if len(m) == 1 else m[1]
+
+    second_f = '0' if len(s) == 1 else s[0]
+    second_s = s[0] if len(s) == 1 else s[1]
 
     status =[hour_f,hour_s,minute_f,minute_s,second_f,second_s]
 
-
-    for j, obj in enumerate(objs):
-        i = 0
-        for clock in obj:
-            wtfamidoing(clock, digits[int(status[j])][i])
-            i+=1
+    for i, obj in enumerate(objs):
+        for j, clock in enumerate(obj):
+            func_rotation(clock, digits[int(status[i])][j])
 
 
 pyglet.clock.schedule_interval(update, 1/60)
