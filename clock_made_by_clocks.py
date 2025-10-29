@@ -119,7 +119,6 @@ t = datetime.datetime.now()
 delta = datetime.timedelta(seconds=1/60)
 
 def func_rotation(obj, state):
-
     if obj.arrow_hour.rotation % 360  != obj.states[state][0] or obj.arrow_min.rotation % 360 != obj.states[state][1]:
         h, m = 0, 0
         if obj.arrow_hour.rotation % 360 == obj.states[state][0] and h == 0:
@@ -132,7 +131,6 @@ def func_rotation(obj, state):
             obj.arrow_hour.rotation += 15
         if m == 0:
             obj.arrow_min.rotation += 15
-
 
 h_f_digit = [Clock(origin_x=200 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4)]
 h_s_digit = [Clock(origin_x=210 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4,8)]
