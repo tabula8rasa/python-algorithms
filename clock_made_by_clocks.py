@@ -1,8 +1,8 @@
-import pyglet
+import pyglet, re
 from pyglet.window import key
 from pyglet import shapes
-import datetime
-import re
+from datetime import datetime
+
 
 window = pyglet.window.Window(width=1850, height=500,caption='Clock_by_clocks')
 pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
@@ -147,7 +147,7 @@ objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
 
 def update(dt):
 
-    full_time_info = datetime.datetime.now()
+    full_time_info = datetime.now()
 
     current_time = re.sub(":","", re.findall("[0-9][0-9]:[0-9][0-9]:[0-9][0-9]", str(full_time_info))[0])
 
