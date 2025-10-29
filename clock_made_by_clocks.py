@@ -3,20 +3,19 @@ from pyglet.window import key
 from pyglet import shapes
 import datetime
 
-
 window = pyglet.window.Window(width=1850, height=500,caption='Clock_by_clocks')
 pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 
-CLOCK= pyglet.graphics.Batch()
+CLOCK = pyglet.graphics.Batch()
 
 dots = [shapes.Circle(x=x,y=y,segments=50, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
 
 class Clock:
     def __init__(self, origin_x: int, origin_y: int, radius: int):
 
-        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments = 500, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
+        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments=500, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
         self.circle = shapes.Circle(x=origin_x, y=origin_y, segments=500, radius=radius, color=(230, 230, 230), batch=CLOCK)
         self.arrow_hour = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=7, color=(0,0, 0), batch=CLOCK)
         self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=7, color=(0, 0, 0), batch=CLOCK)
@@ -113,7 +112,7 @@ digits = [
   ]]
 
 def func_rotation(obj, state):
-    """Rotate both arrows to given possision
+    """Rotate both arrows to given position
 
     Args:
         obj: Single clock
@@ -141,6 +140,7 @@ m_f_digit = [Clock(origin_x=240 + 60 * i, origin_y=375 - 60 * j,  radius = 25) f
 m_s_digit = [Clock(origin_x=250 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(12,16)]
 s_f_digit = [Clock(origin_x=280 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(16,20)]
 s_s_digit = [Clock(origin_x=290 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(20,24)]
+
 objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
 
 def update(dt):
