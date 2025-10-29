@@ -10,6 +10,7 @@ window.push_handlers(keys)
 
 CLOCK = pyglet.graphics.Batch()
 
+# Dots between hours, minutes and seconds
 dots = [shapes.Circle(x=x,y=y,segments=50, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
 
 class Clock:
