@@ -144,17 +144,34 @@ def func_rotation(obj, state):
         if m == 0:
             obj.arrow_min.rotation += 15
 
-def make_digit(origin_x: int, origin_y: int, w: int = 4, h: int = 6, dx: int = 60, dy: int = 60):
+def make_digit(origin_x: int, origin_y: int = 375, w: int = 4, h: int = 6, dx: int = 60, dy: int = 60):
     return [Clock(origin_x + i*dx, origin_y - j*dy, RADIUS)
             for j in range(h) for i in range(w)]
 
 objs = [make_digit(200 + (i*4)*60 + (i % 2) *(i * 20 - 10) - (i % 2 - 1) * (i * 20), 375 ) for i in range(6)]
 
+DX = 60            # width of a single clock cell
+BLOCK = 4*DX       # width of one digit
+GAP = 10           # regular gap between digits
+COLON_GAP = 30     # extra gap before the ":" separator
+x0 = 200           # starting x position
+
+digit_x = [
+    x0,
+    x0 + GAP + BLOCK,
+    x0 + GAP + 2*BLOCK + COLON_GAP,
+    x0 + 2*GAP + 3*BLOCK + COLON_GAP,
+    x0 + 2*GAP + 4*BLOCK + 2*COLON_GAP,
+    x0 + 3*GAP + 5*BLOCK + 2*COLON_GAP
+]
+
+digits = [make_digit(x) for x in digit_x]
+
 def update(dt):
 
     current_time = list(datetime.now().strftime("%H%M%S"))
 
-    for i, obj in enumerate(objs):
+    for i, obj in enumerate(digits):
         for j, clock in enumerate(obj):
             func_rotation(clock, DIGITS[int(current_time[i])][j])
 
