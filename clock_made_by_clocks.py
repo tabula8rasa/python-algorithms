@@ -143,14 +143,11 @@ def func_rotation(obj, state):
         if m == 0:
             obj.arrow_min.rotation += 15
 
-h_f_digit = [Clock(origin_x=200 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(4)]
-h_s_digit = [Clock(origin_x=210 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(4,8)]
-m_f_digit = [Clock(origin_x=240 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(8,12)]
-m_s_digit = [Clock(origin_x=250 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(12,16)]
-s_f_digit = [Clock(origin_x=280 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(16,20)]
-s_s_digit = [Clock(origin_x=290 + 60 * i, origin_y=375 - 60 * j,  radius = RADIUS) for j in range(6) for i in range(20,24)]
+def make_digit(origin_x: int, origin_y: int, w: int = 4, h: int = 6, dx: int = 60, dy: int = 60):
+    return [Clock(origin_x + i*dx, origin_y - j*dy, RADIUS)
+            for j in range(h) for i in range(w)]
 
-objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
+objs = [make_digit(200 + (i*4)*60 + (i % 2) *(i * 20 - 10) - (i % 2 - 1) * (i * 20), 375 ) for i in range(6)]
 
 def update(dt):
 
