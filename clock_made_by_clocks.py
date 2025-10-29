@@ -3,7 +3,7 @@ from pyglet.window import key
 from pyglet import shapes
 import datetime
 
-# Create a window
+
 window = pyglet.window.Window(width=1850, height=500,caption='Clock_by_clocks')
 pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
 keys = key.KeyStateHandler()
@@ -14,7 +14,6 @@ CLOCK= pyglet.graphics.Batch()
 dots = [shapes.Circle(x=x,y=y,segments=50, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
 
 class Clock:
-
     def __init__(self, origin_x: int, origin_y: int, radius: int):
 
         self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments = 500, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
@@ -30,7 +29,6 @@ class Clock:
                        'E':[135,135]}
         self.arrow_hour.rotation = self.states['E'][0]
         self.arrow_min.rotation = self.states['E'][1]
-
 
 digits = [
   [
@@ -114,17 +112,22 @@ digits = [
     'TR', 'H',  'H',  'TL',
   ]]
 
-
-t = datetime.datetime.now()
-delta = datetime.timedelta(seconds=1/60)
-
 def func_rotation(obj, state):
+    """Rotate both arrows to given possision
+
+    Args:
+        obj: Single clock
+        state: Position which rotate to
+
+    Returns:
+        None
+    """
     if obj.arrow_hour.rotation % 360  != obj.states[state][0] or obj.arrow_min.rotation % 360 != obj.states[state][1]:
         h, m = 0, 0
-        if obj.arrow_hour.rotation % 360 == obj.states[state][0] and h == 0:
+        if obj.arrow_hour.rotation % 360 == obj.states[state][0]:
             obj.arrow_hour.rotation = obj.states[state][0]
             h = 1
-        if obj.arrow_min.rotation % 360 == obj.states[state][1] and m == 0:
+        if obj.arrow_min.rotation % 360 == obj.states[state][1]:
             obj.arrow_min.rotation = obj.states[state][1]
             m = 1
         if h == 0:
@@ -141,9 +144,8 @@ s_s_digit = [Clock(origin_x=290 + 60 * i, origin_y=375 - 60 * j,  radius = 25) f
 objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
 
 def update(dt):
-    global t
-    t += delta
 
+    t = datetime.datetime.now()
     h = str(t.hour)
     m = str(t.minute)
     s = str(t.second)
@@ -163,15 +165,12 @@ def update(dt):
         for j, clock in enumerate(obj):
             func_rotation(clock, digits[int(status[i])][j])
 
-
 pyglet.clock.schedule_interval(update, 1/60)
-
 
 @window.event
 def on_draw():
     window.clear()
     CLOCK.draw()
-
 
 pyglet.app.run()
 
