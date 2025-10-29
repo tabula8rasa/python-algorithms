@@ -148,8 +148,6 @@ def make_digit(origin_x: int, origin_y: int = 375, w: int = 4, h: int = 6, dx: i
     return [Clock(origin_x + i*dx, origin_y - j*dy, RADIUS)
             for j in range(h) for i in range(w)]
 
-objs = [make_digit(200 + (i*4)*60 + (i % 2) *(i * 20 - 10) - (i % 2 - 1) * (i * 20), 375 ) for i in range(6)]
-
 DX = 60            # width of a single clock cell
 BLOCK = 4*DX       # width of one digit
 GAP = 10           # regular gap between digits
