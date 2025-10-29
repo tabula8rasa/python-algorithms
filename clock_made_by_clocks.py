@@ -114,6 +114,7 @@ digits = [
     'TR', 'H',  'H',  'TL',
   ]]
 
+
 t = datetime.datetime.now()
 delta = datetime.timedelta(seconds=1/60)
 
