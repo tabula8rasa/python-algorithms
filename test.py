@@ -4,7 +4,7 @@ from pyglet import shapes
 import datetime
 
 # Create a window
-window = pyglet.window.Window(width=1850, height=500,caption='Clock of clocks')
+window = pyglet.window.Window(width=1850, height=500,caption='Clock_by_clocks')
 pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
@@ -132,7 +132,7 @@ def wtfamidoing(obj, state):
         if m == 0:
             obj.arrow_min.rotation += 15
 
-# objs = [Clock(origin_x=200 + 55 * i, origin_y=100 + 55 * j,  radius = 25) for j in range(6) for i in range(24)]
+
 h_f_digit = [Clock(origin_x=200 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4)]
 h_s_digit = [Clock(origin_x=210 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4,8)]
 m_f_digit = [Clock(origin_x=240 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(8,12)]
@@ -142,7 +142,7 @@ s_s_digit = [Clock(origin_x=290 + 60 * i, origin_y=375 - 60 * j,  radius = 25) f
 objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
 
 def update(dt):
-    global SYMBOL, t
+    global t
     t += delta
 
     if len(str(t.hour)) == 1:
@@ -164,48 +164,24 @@ def update(dt):
         second_f = str(t.second)[0]
         second_s = str(t.second)[1]
 
-    # print(second_f)
-    i=0
-    j=0
-    ii=0
-    jj=0
-    iii=0
-    jjj=0
+    status =[hour_f,hour_s,minute_f,minute_s,second_f,second_s]
 
-    for clock in objs[-1]:
-        wtfamidoing(clock, digits[int(second_s)][i])
-        i+=1
-    for clock in objs[-2]:
-        wtfamidoing(clock, digits[int(second_f)][j])
-        j += 1
-    for clock in objs[-3]:
-        wtfamidoing(clock, digits[int(minute_s)][ii])
-        ii += 1
-    for clock in objs[-4]:
-        wtfamidoing(clock, digits[int(minute_f)][jj])
-        jj += 1
-    for clock in objs[-5]:
-        wtfamidoing(clock, digits[int(hour_s)][iii])
-        iii += 1
-    for clock in objs[-6]:
-        wtfamidoing(clock, digits[int(hour_f)][jjj])
-        jjj += 1
+
+    for j, obj in enumerate(objs):
+        i = 0
+        for clock in obj:
+            wtfamidoing(clock, digits[int(status[j])][i])
+            i+=1
 
 
 pyglet.clock.schedule_interval(update, 1/60)
 
-@window.event
-def on_key_press(symbol, modifiers):
-    global SYMBOL
-    SYMBOL = symbol
-    print(symbol)
 
-# Define the on_draw event handler
 @window.event
 def on_draw():
-    window.clear()  # Clear the window to prepare for a new frame
-    CLOCK.draw()    # Draw all shapes in the batch
+    window.clear()
+    CLOCK.draw()
 
-# Run the Pyglet application
+
 pyglet.app.run()
 
