@@ -18,27 +18,7 @@ STATE_ANGLES = {
     'E':  (135, 135),
 }
 
-window = pyglet.window.Window(width=WIN_W, height=WIN_H,caption='Clock_by_clocks')
-pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
-keys = key.KeyStateHandler()
-window.push_handlers(keys)
-CLOCK = pyglet.graphics.Batch()
-
-# Dots between hours, minutes and seconds
-dots = [shapes.Circle(x=x,y=y,segments=CIRCLE_SEG, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
-
-class Clock:
-    def __init__(self, origin_x: int, origin_y: int, radius: int):
-
-        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments=CIRCLE_SEG, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
-        self.circle = shapes.Circle(x=origin_x, y=origin_y, segments=CIRCLE_SEG, radius=radius, color=(230, 230, 230), batch=CLOCK)
-        self.arrow_hour = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=LINE_THICK, color=(0,0, 0), batch=CLOCK)
-        self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=LINE_THICK, color=(0, 0, 0), batch=CLOCK)
-
-        self.arrow_hour.rotation = STATE_ANGLES['E'][0]
-        self.arrow_min.rotation = STATE_ANGLES['E'][1]
-
-digits = [
+DIGITS = [
   [
     'BR', 'H',  'H',  'BL',
     'V',  'BR', 'BL', 'V',
@@ -120,6 +100,27 @@ digits = [
     'TR', 'H',  'H',  'TL',
   ]]
 
+window = pyglet.window.Window(width=WIN_W, height=WIN_H,caption='Clock_by_clocks')
+pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
+keys = key.KeyStateHandler()
+window.push_handlers(keys)
+CLOCK = pyglet.graphics.Batch()
+
+# Dots between hours, minutes and seconds
+dots = [shapes.Circle(x=x,y=y,segments=CIRCLE_SEG, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
+
+class Clock:
+    def __init__(self, origin_x: int, origin_y: int, radius: int):
+
+        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments=CIRCLE_SEG, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
+        self.circle = shapes.Circle(x=origin_x, y=origin_y, segments=CIRCLE_SEG, radius=radius, color=(230, 230, 230), batch=CLOCK)
+        self.arrow_hour = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=LINE_THICK, color=(0,0, 0), batch=CLOCK)
+        self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=LINE_THICK, color=(0, 0, 0), batch=CLOCK)
+
+        self.arrow_hour.rotation = STATE_ANGLES['E'][0]
+        self.arrow_min.rotation = STATE_ANGLES['E'][1]
+
+
 def func_rotation(obj, state):
     """Rotate both arrows to given position
 
@@ -151,13 +152,11 @@ objs = [make_digit(200 + (i*4)*60 + (i % 2) *(i * 20 - 10) - (i % 2 - 1) * (i * 
 
 def update(dt):
 
-    current_time = datetime.now().strftime("%H%M%S")
-
-    status = list(current_time)
+    current_time = list(datetime.now().strftime("%H%M%S"))
 
     for i, obj in enumerate(objs):
         for j, clock in enumerate(obj):
-            func_rotation(clock, digits[int(status[i])][j])
+            func_rotation(clock, DIGITS[int(current_time[i])][j])
 
 pyglet.clock.schedule_interval(update, 1/60)
 
