@@ -1,50 +1,97 @@
-from itertools import batched
 import pyglet
+from pyglet.window import key
 from pyglet import shapes
-from math import cos, sin, pi
-from typing import List, Tuple
+import random
 
 # Create a window
-window = pyglet.window.Window(width=1920, height=1080, caption='Pyglet Example')
+window = pyglet.window.Window(width=800, height=600, caption="Endless Runner Game")
 
-# Create a batch for efficient drawing of multiple shapes
-CLOCK= pyglet.graphics.Batch()
+# Define gravity, jump speed, and player speed
+gravity = -900
+jump_speed = 500
+player_speed = 300
 
+# Create a batch for better performance
+batch = pyglet.graphics.Batch()
 
-class Clock():
+# Create player using shapes
+player = shapes.Rectangle(50, 100, 50, 50, color=(50, 225, 30), batch=batch)
 
-    def __init__(self, origin_x, origin_y, radius):
-        self.origin_x = origin_x
-        self.origin_y = origin_y
-        self.radius = radius
+# Create ground using shapes
+ground = shapes.Rectangle(0, 50, 800, 20, color=(0, 0, 255), batch=batch)
 
-    def create_circle(self):
-        self.circle = shapes.Circle(x=self.origin_x, y=self.origin_y, radius=self.radius, color=(250, 250, 250), batch=CLOCK)
+# Variables to track player movement and state
+keys = key.KeyStateHandler()
+window.push_handlers(keys)
+player_velocity_y = 0
+is_jumping = False
 
-    def create_arrows(self):
-        self.arrow_hour = shapes.Line(x=self.origin_x, y=self.origin_y, x2=self.origin_x + self.radius/2, y2=self.origin_y, thickness=4.8, color=(240, 20, 20), batch=CLOCK)
-        self.arrow_min  = shapes.Line(x=self.origin_x, y=self.origin_y, x2=self.origin_x + self.radius, y2=self.origin_y, thickness=2.8, color=(20, 240, 20), batch=CLOCK)
+# List to hold obstacles
+obstacles = []
 
+# Function to create obstacles
+def create_obstacle():
+    x = window.width
+    y = ground.y + ground.height
+    width = 20
+    height = random.randint(20, 50)
+    obstacle = shapes.Rectangle(x, y, width, height, color=(255, 0, 0), batch=batch)
+    obstacles.append(obstacle)
 
-objs = [Clock(origin_x=200 + 55 * i, origin_y=100 + 55 * j,  radius = 25) for j in range(6) for i in range(24)]
-for i in objs:
-    i.create_circle()
-    i.create_arrows()
-# print(objs)
-#arrows = [shapes.Line(x=200+55*i,y=100+55*j,x2=225+55*i,y2=100+55*j,thickness=5.8,color=(240,20,20), batch=CLOCK) for j in range(6) for i in range(24)]
+# Function to update obstacles
+def update_obstacles(dt):
+    for obstacle in obstacles:
+        obstacle.x -= player_speed * dt
+    # Remove obstacles that are off-screen
+    obstacles[:] = [obstacle for obstacle in obstacles if obstacle.x + obstacle.width > 0]
+
+# Update function to handle movement and gravity
 def update(dt):
-    for i in objs:
-        i.arrow_min.rotation += dt / 60 * 360
+    global player_velocity_y, is_jumping
 
-pyglet.clock.schedule_interval(update, 1)  # Call update 60 times per second
+    # Apply gravity
+    player_velocity_y += gravity * dt
 
+    # Move player vertically
+    player.y += player_velocity_y * dt
 
-# Define the on_draw event handler
+    # Check for collisions with the ground
+    if player.y <= ground.y + ground.height:
+        player.y = ground.y + ground.height
+        player_velocity_y = 0
+        is_jumping = False
+
+    # Check for collisions with obstacles
+    for obstacle in obstacles:
+        if (player.x + player.width > obstacle.x and player.x < obstacle.x + obstacle.width and
+                player.y < obstacle.y + obstacle.height):
+            print("Game Over!")
+            pyglet.app.exit()
+
+    # Update obstacles
+    update_obstacles(dt)
+
+@window.event
+def on_key_press(symbol, modifiers):
+    global player_velocity_y, is_jumping
+
+    # Handle jump
+    if symbol == key.SPACE and not is_jumping:
+        player_velocity_y = jump_speed
+        is_jumping = True
+
 @window.event
 def on_draw():
-    window.clear()  # Clear the window to prepare for a new frame
-    CLOCK.draw()    # Draw all shapes in the batch
+    window.clear()
+    batch.draw()
 
-# Run the Pyglet application
+# Schedule the update function
+pyglet.clock.schedule_interval(update, 1/60.0)
+# Schedule obstacle creation
+pyglet.clock.schedule_interval(lambda dt: create_obstacle(), 1.5)
+
+# Start the game
 pyglet.app.run()
 
+# Credits to Proxlight - Subscribe for more Python game tutorials!
+print("Thanks for playing! Check out Proxlight on YouTube for more tutorials.")
