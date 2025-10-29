@@ -1,30 +1,26 @@
-
 import pyglet
-
 from pyglet.window import key
 from pyglet import shapes
-
 import datetime
 
-
 # Create a window
-window = pyglet.window.Window(width=1750, height=500,caption='Pyglet Example')
-
+window = pyglet.window.Window(width=1850, height=500,caption='Clock of clocks')
+pyglet.gl.glClearColor(0.8, 0.85, 0.85, 1.0)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 
-# Create a batch for efficient drawing of multiple shapes
 CLOCK= pyglet.graphics.Batch()
-SYMBOL = None
+
+dots = [shapes.Circle(x=x,y=y,segments=50, radius=8, color=(0,0,0), batch=CLOCK) for x in [675,1195] for y in [195,255]]
 
 class Clock:
 
     def __init__(self, origin_x: int, origin_y: int, radius: int):
 
-        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments = 500, radius=radius+5, color=(168, 168, 168), batch=CLOCK)
-        self.circle = shapes.Circle(x=origin_x, y=origin_y, segments=500, radius=radius, color=(250, 250, 250), batch=CLOCK)
-        self.arrow_hour = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=6, color=(0,0, 0), batch=CLOCK)
-        self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=6, color=(0, 0, 0), batch=CLOCK)
+        self.border_circle = shapes.Circle(x=origin_x, y=origin_y, segments = 500, radius=radius+4, color=(250, 250, 250), batch=CLOCK)
+        self.circle = shapes.Circle(x=origin_x, y=origin_y, segments=500, radius=radius, color=(230, 230, 230), batch=CLOCK)
+        self.arrow_hour = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=7, color=(0,0, 0), batch=CLOCK)
+        self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=7, color=(0, 0, 0), batch=CLOCK)
         self.states = {'H':[0, 180],
                        'V':[270,90],
                        'TL':[180,270],
@@ -32,9 +28,8 @@ class Clock:
                        'BL':[180,90],
                        'BR':[0,90],
                        'E':[135,135]}
-        self.position = 'E'
-        self.arrow_hour.rotation = self.states[self.position][0]
-        self.arrow_min.rotation = self.states[self.position][1]
+        self.arrow_hour.rotation = self.states['E'][0]
+        self.arrow_min.rotation = self.states['E'][1]
 
 
 digits = [
@@ -136,16 +131,14 @@ def wtfamidoing(obj, state):
             obj.arrow_hour.rotation += 15
         if m == 0:
             obj.arrow_min.rotation += 15
-        if h + m == 2:
-            SYMBOL = None
 
 # objs = [Clock(origin_x=200 + 55 * i, origin_y=100 + 55 * j,  radius = 25) for j in range(6) for i in range(24)]
-h_f_digit = [Clock(origin_x=200 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(4)]
-h_s_digit = [Clock(origin_x=210 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(4,8)]
-m_f_digit = [Clock(origin_x=240 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(8,12)]
-m_s_digit = [Clock(origin_x=250 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(12,16)]
-s_f_digit = [Clock(origin_x=280 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(16,20)]
-s_s_digit = [Clock(origin_x=290 + 55 * i, origin_y=375 - 55 * j,  radius = 25) for j in range(6) for i in range(20,24)]
+h_f_digit = [Clock(origin_x=200 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4)]
+h_s_digit = [Clock(origin_x=210 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(4,8)]
+m_f_digit = [Clock(origin_x=240 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(8,12)]
+m_s_digit = [Clock(origin_x=250 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(12,16)]
+s_f_digit = [Clock(origin_x=280 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(16,20)]
+s_s_digit = [Clock(origin_x=290 + 60 * i, origin_y=375 - 60 * j,  radius = 25) for j in range(6) for i in range(20,24)]
 objs =[h_f_digit,h_s_digit,m_f_digit,m_s_digit,s_f_digit,s_s_digit]
 
 def update(dt):
