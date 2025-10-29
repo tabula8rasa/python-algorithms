@@ -27,10 +27,10 @@ class Clock:
         self.arrow_min = shapes.Line(x=origin_x, y=origin_y, x2=origin_x + radius, y2=origin_y, thickness=4.8, color=(20, 240, 20), batch=CLOCK)
         self.states = {'H':[0, 180],
                        'V':[270,90],
-                       'TL':[180,270],
-                       'TR':[0,270],
-                       'BL':[180,90],
-                       'BR':[0,90],
+                       'BL':[180,270],
+                       'BR':[0,270],
+                       'TL':[180,90],
+                       'TR':[0,90],
                        'E':[135,135]}
         self.position = 'E'
         self.arrow_hour.rotation = self.states[self.position][0]
@@ -125,24 +125,26 @@ delta = datetime.timedelta(seconds=1/60)
 print(t.hour)
 print(t.minute)
 print(t.second)
-def wtfamidoing(obj):
-    global SYMBOL
-    if SYMBOL is not None:
-        state = chr(SYMBOL).upper()
-        if obj.arrow_hour.rotation % 360  != obj.states[state][0] or obj.arrow_min.rotation % 360 != obj.states[state][1]:
-            h, m = 0, 0
-            if obj.arrow_hour.rotation % 360 == obj.states[state][0] and h == 0:
-                obj.arrow_hour.rotation = obj.states[state][0]
-                h = 1
-            if obj.arrow_min.rotation % 360 == obj.states[state][1] and m == 0:
-                obj.arrow_min.rotation = obj.states[state][1]
-                m = 1
-            if h == 0:
-                obj.arrow_hour.rotation += 15
-            if m == 0:
-                obj.arrow_min.rotation += 15
-            if h + m == 2:
-                SYMBOL = None
+
+
+def wtfamidoing(obj, state):
+    # global SYMBOL
+    # if SYMBOL is not None:
+    #     state = chr(SYMBOL).upper()
+    if obj.arrow_hour.rotation % 360  != obj.states[state][0] or obj.arrow_min.rotation % 360 != obj.states[state][1]:
+        h, m = 0, 0
+        if obj.arrow_hour.rotation % 360 == obj.states[state][0] and h == 0:
+            obj.arrow_hour.rotation = obj.states[state][0]
+            h = 1
+        if obj.arrow_min.rotation % 360 == obj.states[state][1] and m == 0:
+            obj.arrow_min.rotation = obj.states[state][1]
+            m = 1
+        if h == 0:
+            obj.arrow_hour.rotation += 15
+        if m == 0:
+            obj.arrow_min.rotation += 15
+        if h + m == 2:
+            SYMBOL = None
 
 # objs = [Clock(origin_x=200 + 55 * i, origin_y=100 + 55 * j,  radius = 25) for j in range(6) for i in range(24)]
 h_f_digit = [Clock(origin_x=200 + 55 * i, origin_y=100 + 55 * j,  radius = 25) for j in range(6) for i in range(4)]
@@ -157,13 +159,36 @@ def update(dt):
     global SYMBOL, t
     t += delta
 
-    hour = t.hour
-    minute = t.minute
-    second = t.second
-    print(second)
-    for obj in objs:
-        for clock in obj:
-            wtfamidoing(clock)
+    if len(str(t.hour)) == 1:
+        hour_f = '0'
+        hour_s = str(t.hour)[0]
+    else:
+        hour_f = str(t.hour)[0]
+        hour_s = str(t.hour)[1]
+    if len(str(t.minute)) == 1:
+        minute_f = '0'
+        minute_s = str(t.minute)[0]
+    else:
+        minute_f = str(t.minute)[0]
+        minute_s = str(t.minute)[1]
+    if len(str(t.second)) == 1:
+        second_f = '0'
+        second_s = str(t.second)[0]
+    else:
+        second_f = str(t.second)[0]
+        second_s = str(t.second)[1]
+
+    print(second_f)
+    # second_f = '0'
+    i=0
+    j=0
+
+    for clock in objs[-1]:
+        wtfamidoing(clock, digits[int(second_s)][i])
+        i+=1
+    for clock in objs[-2]:
+        wtfamidoing(clock, digits[int(second_f)][j])
+        j += 1
 
 
 pyglet.clock.schedule_interval(update, 1/60)
