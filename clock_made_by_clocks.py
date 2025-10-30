@@ -132,16 +132,15 @@ def func_rotation(obj, state):
         None
     """
     if obj.arrow_hour.rotation % 360  != STATE_ANGLES[state][0] or obj.arrow_min.rotation % 360 != STATE_ANGLES[state][1]:
-        h, m = 0, 0
+
         if obj.arrow_hour.rotation % 360 == STATE_ANGLES[state][0]:
             obj.arrow_hour.rotation = STATE_ANGLES[state][0]
-            h = 1
+        else:
+            obj.arrow_hour.rotation += 15
+
         if obj.arrow_min.rotation % 360 == STATE_ANGLES[state][1]:
             obj.arrow_min.rotation = STATE_ANGLES[state][1]
-            m = 1
-        if h == 0:
-            obj.arrow_hour.rotation += 15
-        if m == 0:
+        else:
             obj.arrow_min.rotation += 15
 
 def make_digit(origin_x: int, origin_y: int = 375, w: int = 4, h: int = 6, dx: int = 60, dy: int = 60):
