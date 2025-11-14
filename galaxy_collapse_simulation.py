@@ -25,7 +25,7 @@ def generate_spiral_galaxy(
     n_particles: int = 50,
     n_arms: int = 5,
     center: Optional[Vector2D] = None,
-    GM: float = 10.0,   # "гравитационный параметр" центральной массы
+    GM: float = 20.0,
 ) -> List[Particle]:
     if center is None:
         center = np.array([0.0, 0.0], dtype=np.float64)
@@ -36,6 +36,7 @@ def generate_spiral_galaxy(
 
     #черная дыра
     particles.append(Particle(20, center, np.array([0,0])))
+
     for i in range(n_particles):
         r = radii[i]
 
@@ -71,11 +72,11 @@ def generate_spiral_galaxy(
 # ---------------- TK + анимация ----------------
 
 WIDTH, HEIGHT = 800, 800
-SCALE = 20.0          # пикселей на единицу
+SCALE = 10.0          # пикселей на единицу
 DT = 0.01             # шаг времени
 G = 1.0
-M_central = 10.0      # центральная масса
-CENTER = np.array([0.0, 0.0], dtype=np.float64)
+M_central = 20.0      # центральная масса
+CENTER = np.array([5.0, 5.0], dtype=np.float64)
 
 root = tk.Tk()
 root.title("Galaxy simulation")
@@ -84,14 +85,15 @@ canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="black")
 canvas.pack()
 
 # создаём частицы
-particles = generate_spiral_galaxy(n_particles=500, GM=G * M_central)
+galaxy_first = generate_spiral_galaxy(n_particles=500, center=np.array([5,5]), GM=G * M_central)
+# galaxy_second = generate_spiral_galaxy(n_particles=300, n_arms=2, center=np.array([1,1]), GM=G * M_central)
 
 # рисуем точки
 RADIUS = 2
 items: List[int] = []
 
 
-for i,p in enumerate(particles):
+for i,p in enumerate(galaxy_first):
     sx = WIDTH / 2 + p.position[0] * SCALE
     sy = HEIGHT / 2 + p.position[1] * SCALE
     item_id = canvas.create_oval(
@@ -102,7 +104,7 @@ for i,p in enumerate(particles):
 
 
 def update():
-    for i, p in enumerate(particles):
+    for i, p in enumerate(galaxy_first):
         # вектор от частицы к центру
         r_vec = p.position - CENTER
         r = np.linalg.norm(r_vec)
