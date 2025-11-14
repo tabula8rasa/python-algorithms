@@ -22,8 +22,8 @@ class Particle:
 
 
 def generate_spiral_galaxy(
-    n_particles: int = 500,
-    n_arms: int = 2,
+    n_particles: int = 50,
+    n_arms: int = 5,
     center: Optional[Vector2D] = None,
     GM: float = 10.0,   # "гравитационный параметр" центральной массы
 ) -> List[Particle]:
@@ -35,7 +35,7 @@ def generate_spiral_galaxy(
     radii = np.linspace(1.0, 10.0, n_particles)
 
     #черная дыра
-    particles.append(Particle(mass, pos, vel))
+    particles.append(Particle(20, center, np.array([0,0])))
     for i in range(n_particles):
         r = radii[i]
 
@@ -71,7 +71,7 @@ def generate_spiral_galaxy(
 # ---------------- TK + анимация ----------------
 
 WIDTH, HEIGHT = 800, 800
-SCALE = 10.0          # пикселей на единицу
+SCALE = 20.0          # пикселей на единицу
 DT = 0.01             # шаг времени
 G = 1.0
 M_central = 10.0      # центральная масса
@@ -84,18 +84,19 @@ canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="black")
 canvas.pack()
 
 # создаём частицы
-particles = generate_spiral_galaxy(n_particles=50, GM=G * M_central)
+particles = generate_spiral_galaxy(n_particles=500, GM=G * M_central)
 
 # рисуем точки
 RADIUS = 2
 items: List[int] = []
 
-for p in particles:
+
+for i,p in enumerate(particles):
     sx = WIDTH / 2 + p.position[0] * SCALE
     sy = HEIGHT / 2 + p.position[1] * SCALE
     item_id = canvas.create_oval(
         sx - RADIUS, sy - RADIUS, sx + RADIUS, sy + RADIUS,
-        fill="white", outline=""
+        fill= "white" if i != 0 else "red" , outline=""
     )
     items.append(item_id)
 
@@ -129,5 +130,5 @@ def update():
     canvas.after(16, update)  # ~60 FPS
 
 
-# update()
+update()
 root.mainloop()
