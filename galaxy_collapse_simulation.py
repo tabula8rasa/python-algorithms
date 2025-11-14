@@ -1,7 +1,7 @@
-import numpy as np
-import numpy.typing as npt
 import tkinter as tk
+import numpy as np
 from typing import Annotated, List, Optional
+import numpy.typing as npt
 import os
 
 os.environ["TCL_LIBRARY"] = r"C:\Users\legop\AppData\Local\Programs\Python\Python313\tcl\tcl8.6"
@@ -20,46 +20,33 @@ class Particle:
         self.position: Vector2D = initial_position
         self.velocity: Vector2D = initial_velocity
 
-
 def generate_spiral_galaxy(
     n_particles: int = 50,
-    n_arms: int = 5,
+    n_arms: int = 2,
     center: Optional[Vector2D] = None,
-    GM: float = 20.0,
+    GM: float = 10.0,
 ) -> List[Particle]:
     if center is None:
         center = np.array([0.0, 0.0], dtype=np.float64)
 
     particles: List[Particle] = []
-
     radii = np.linspace(1.0, 10.0, n_particles)
-
-    #черная дыра
-    particles.append(Particle(20, center, np.array([0,0])))
 
     for i in range(n_particles):
         r = radii[i]
 
-        # базовый угол спирали
         base_angle = 0.5 * r
-
-        # выбор рукава
         arm = i % n_arms
         arm_offset = 2.0 * np.pi * arm / n_arms
-
-        # небольшой шум
         angle = base_angle + arm_offset + np.random.normal(scale=0.2)
 
-        # позиция
         x = center[0] + r * np.cos(angle)
         y = center[1] + r * np.sin(angle)
         pos = np.array([x, y], dtype=np.float64)
 
-        # направление скорости по касательной
         vx_dir = -np.sin(angle)
         vy_dir = np.cos(angle)
 
-        # скорость для почти круговой орбиты: v ~ sqrt(GM / r)
         speed = np.sqrt(GM / r)
         vel = np.array([vx_dir * speed, vy_dir * speed], dtype=np.float64)
 
@@ -69,57 +56,88 @@ def generate_spiral_galaxy(
     return particles
 
 
-# ---------------- TK + анимация ----------------
+# ---------- параметры симуляции ----------
 
 WIDTH, HEIGHT = 800, 800
-SCALE = 10.0          # пикселей на единицу
-DT = 0.01             # шаг времени
+SCALE = 10.0
+DT = 0.01
+
 G = 1.0
-M_central = 20.0      # центральная масса
-CENTER = np.array([5.0, 5.0], dtype=np.float64)
+M_central = 10.0
+CENTER_1 = np.array([5.0, 5.0], dtype=np.float64)
+
+# 1 симуляционная единица времени = столько лет
+YEARS_PER_SIM_UNIT = 1_000.0
+
+sim_time_years = 0.0  # "прошло лет", значит и световых лет
+
+
+# ---------- TK UI ----------
 
 root = tk.Tk()
 root.title("Galaxy simulation")
 
-canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="black")
-canvas.pack()
+main_frame = tk.Frame(root)
+main_frame.pack()
 
-# создаём частицы
-galaxy_first = generate_spiral_galaxy(n_particles=500, center=np.array([5,5]), GM=G * M_central)
-# galaxy_second = generate_spiral_galaxy(n_particles=300, n_arms=2, center=np.array([1,1]), GM=G * M_central)
+canvas = tk.Canvas(main_frame, width=WIDTH, height=HEIGHT, bg="black")
+canvas.pack(side=tk.LEFT)
 
-# рисуем точки
+side_frame = tk.Frame(main_frame, bg="black")
+side_frame.pack(side=tk.LEFT, fill=tk.Y)
+
+time_label = tk.Label(
+    side_frame,
+    text="Свет прошёл:\n0.00 св. лет",
+    fg="white",
+    bg="black",
+    font=("Arial", 12)
+)
+time_label.pack(padx=10, pady=10, anchor="n")
+
+# ---------- частицы ----------
+
+particles = generate_spiral_galaxy(n_particles=500, n_arms=5, center=CENTER_1, GM=G * M_central)
+
 RADIUS = 2
 items: List[int] = []
 
-
-for i,p in enumerate(galaxy_first):
+for p in particles:
     sx = WIDTH / 2 + p.position[0] * SCALE
     sy = HEIGHT / 2 + p.position[1] * SCALE
     item_id = canvas.create_oval(
-        sx - RADIUS, sy - RADIUS, sx + RADIUS, sy + RADIUS,
-        fill= "white" if i != 0 else "red" , outline=""
+        sx - RADIUS, sy - RADIUS,
+        sx + RADIUS, sy + RADIUS,
+        fill="white", outline=""
     )
     items.append(item_id)
 
+# центральная "масса" (для красоты)
+center_radius = 4
+canvas.create_oval(
+    WIDTH / 2 + CENTER_1[0]*SCALE - center_radius,
+    HEIGHT / 2 + CENTER_1[0]*SCALE - center_radius,
+    WIDTH / 2 + CENTER_1[1]*SCALE + center_radius,
+    HEIGHT / 2 + CENTER_1[1]*SCALE + center_radius,
+    fill="yellow", outline=""
+)
+
 
 def update():
-    for i, p in enumerate(galaxy_first):
-        # вектор от частицы к центру
-        r_vec = p.position - CENTER
+    global sim_time_years
+
+    for i, p in enumerate(particles):
+        r_vec = p.position - CENTER_1
         r = np.linalg.norm(r_vec)
 
         if r > 1e-3:
-            # ускорение к центру: a = -G*M * r / r^3
             a = -G * M_central * r_vec / (r ** 3)
         else:
             a = np.zeros(2, dtype=np.float64)
 
-        # интегрирование (простая схема Эйлера)
         p.velocity = p.velocity + a * DT
         p.position = p.position + p.velocity * DT
 
-        # в экранные координаты
         sx = WIDTH / 2 + p.position[0] * SCALE
         sy = HEIGHT / 2 + p.position[1] * SCALE
 
@@ -128,6 +146,12 @@ def update():
             sx - RADIUS, sy - RADIUS,
             sx + RADIUS, sy + RADIUS
         )
+
+    # обновляем "счётчик световых лет"
+    sim_time_years += DT * YEARS_PER_SIM_UNIT
+    time_label.config(
+        text=f"Свет прошёл:\n{sim_time_years:.2f} св. лет"
+    )
 
     canvas.after(16, update)  # ~60 FPS
 
